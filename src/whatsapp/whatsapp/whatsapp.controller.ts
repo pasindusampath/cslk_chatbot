@@ -1,6 +1,7 @@
 import { BadRequestException, Controller, Get,HttpCode,Post,Req } from '@nestjs/common';
 import { Request } from 'express';
 import { WhatsappService } from './whatsapp.service';
+import { json } from 'stream/consumers';
 
 @Controller('whatsapp')
 export class WhatsappController {
@@ -35,10 +36,9 @@ export class WhatsappController {
     @Post('webhook')
     @HttpCode(200)
     async handleIncomingWhatsappMessage(@Req() request:any): Promise<any> {
-        const data = request.body;
-        if (!data) return;
-        const messages = data;
-        const messageData = messages?.entry[0]?.changes[0]?.value?.messages[0];
+        const messages =  request?.body?.entry[0]?.changes[0]?.value?.messages;
+        if(!(messages))return;
+        const messageData = messages[0];
         const sender = messageData?.from;
         switch(messageData?.type) {
             case 'text':
